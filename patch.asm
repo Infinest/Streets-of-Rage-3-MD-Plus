@@ -1,15 +1,17 @@
 ; Build params: ------------------------------------------------------------------------------
 
 JPROM	set 1
-DXROM	set 0
+DXROM	set 1
 
-	if	JPROM&DXROM
-TRACK_ID_TABLE	set $00000B28
-	elseif JPROM
-TRACK_ID_TABLE	set $00000C14
-	else
-TRACK_ID_TABLE	set $0004AD70
-	endif
+;	if	JPROM&DXROM
+;TRACK_ID_TABLE	set $00000B28
+;	else 
+;	if JPROM
+;TRACK_ID_TABLE	set $00000C14
+;	else
+;TRACK_ID_TABLE	set $0004AD70
+;	endif
+;	endif
 
 	if	DXROM&JPROM
 MUSIC_PLAY_FUNCTION 			set $000BC35C
@@ -102,8 +104,8 @@ GET_TRACK_INDEX_FUNCTION:
 	movea.l	#TRACK_ID_TABLE,A1
 GET_TRACK_INDEX_LOOP						; Loop until A1+D1 reaches the address of the input track pointer
 	addq.b	#$1,D1
-	cmpi.b	#TRACK_TABLE_LENGTH,D1
-	bhi		GET_TRACK_INDEX_END_REACHED		; If D1 is higher than TRACK_TABLE_LENGTH there are no more valid tracks in the track table
+	cmpi.b	#INVALID_TRACK_INDEX,(A1,D1)
+	beq		GET_TRACK_INDEX_END_REACHED
 	cmp.b	(A1,D1),D0						; If the value at address A1+D1 match D0 we have found the matching index
 	bne		GET_TRACK_INDEX_LOOP
 	addi.b	#$1,D1							; Increase D1 by $1 to make sure our track list starts at $1
@@ -111,3 +113,10 @@ GET_TRACK_INDEX_LOOP						; Loop until A1+D1 reaches the address of the input tr
 GET_TRACK_INDEX_END_REACHED
 	move.b	#INVALID_TRACK_INDEX,D1			; Write $FF to D1 and return
 	rts
+
+TRACK_ID_TABLE
+	if	DXROM&JPROM
+	dc.b $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $FF
+	else
+	dc.b $09, $14, $01, $18, $0E, $03, $04, $02, $10, $0C, $0B, $11, $0D, $05, $13, $19, $12, $01, $17, $08, $06, $1A, $07, $08, $0A, $15, $0F, $14, $FF
+	endif
