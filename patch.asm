@@ -1,17 +1,7 @@
 ; Build params: ------------------------------------------------------------------------------
 
 JPROM	set 1
-DXROM	set 1
-
-;	if	JPROM&DXROM
-;TRACK_ID_TABLE	set $00000B28
-;	else 
-;	if JPROM
-;TRACK_ID_TABLE	set $00000C14
-;	else
-;TRACK_ID_TABLE	set $0004AD70
-;	endif
-;	endif
+DXROM	set 0
 
 	if	DXROM&JPROM
 MUSIC_PLAY_FUNCTION 			set $000BC35C
